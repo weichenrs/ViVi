@@ -1,1 +1,1 @@
-from .fbp import FBP
+from .fbp import FBPDataset

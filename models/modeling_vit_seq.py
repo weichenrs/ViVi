@@ -852,10 +852,6 @@ class ViTForSemanticSegmentation_seq(ViTPreTrainedModel):
         self.decoder_classifier = nn.Linear(256, config.num_labels)
 
         # Initialize weights and apply final processing
-        # if dist.get_rank() == 0:
-        #     import pdb
-        #     pdb.set_trace()
-        # dist.barrier()
         self.post_init()
 
     @add_start_docstrings_to_model_forward(VIT_INPUTS_DOCSTRING)

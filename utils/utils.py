@@ -35,12 +35,13 @@ class SegVisHook(Hook):
             return
 
         preds, data_samples = outputs
-        img_paths = data_samples['img_path']
-        mask_paths = data_samples['mask_path']
-        _, C, H, W = preds.shape
         preds = torch.argmax(preds, dim=1)
-        for idx, (pred, img_path,
-                  mask_path) in enumerate(zip(preds, img_paths, mask_paths)):
+        for i in range(len(preds)):
+            img_path = data_samples[i].img_path
+            mask_path = data_samples[i].seg_map_path
+            pred = preds[i]
+            C, H, W = preds.shape
+
             pred_mask = np.zeros((H, W, 3), dtype=np.uint8)
             runner.visualizer.set_image(pred_mask)
             for color, class_id in self.palette.items():
@@ -51,7 +52,7 @@ class SegVisHook(Hook):
                 )
             # Convert RGB to BGR
             pred_mask = runner.visualizer.get_image()[..., ::-1]
-            saved_dir = osp.join(runner.log_dir, 'vis_data', str(idx))
+            saved_dir = osp.join(runner.log_dir, 'vis_data', str(i))
             os.makedirs(saved_dir, exist_ok=True)
 
             shutil.copyfile(img_path,

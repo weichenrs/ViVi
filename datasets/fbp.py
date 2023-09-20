@@ -1,42 +1,58 @@
-import os
-from PIL import Image
-import numpy as np
-from torchvision.datasets import VisionDataset
-from utils import create_palette
+# Copyright (c) OpenMMLab. All rights reserved.
+from mmengine.registry import DATASETS
+from mmseg.datasets import BaseSegDataset
 
-class FBP(VisionDataset):
+@DATASETS.register_module()
+class FBPDataset(BaseSegDataset):
+    """ADE20K dataset.
+
+    In segmentation map annotation for ADE20K, 0 stands for background, which
+    is not included in 150 categories. ``reduce_zero_label`` is fixed to True.
+    The ``img_suffix`` is fixed to '.jpg' and ``seg_map_suffix`` is fixed to
+    '.png'.
+    """
+    METAINFO = dict(
+        classes=('industrial area','paddy field','irrigated field','dry cropland','garden land',
+                'arbor forest','shrub forest','park land','natural meadow','artificial meadow',
+                'river','urban residential','lake','pond','fish pond','snow','bareland',
+                'rural residential','stadium','square','road','overpass','railway station','airport'),
+
+        palette=[
+                    [200,   0,   0], # industrial area
+                    [0, 200,   0], # paddy field
+                    [150, 250,   0], # irrigated field
+                    [150, 200, 150], # dry cropland
+                    [200,   0, 200], # garden land
+                    [150,   0, 250], # arbor forest
+                    [150, 150, 250], # shrub forest
+                    [200, 150, 200], # park land
+                    [250, 200,   0], # natural meadow
+                    [200, 200,   0], # artificial meadow
+                    [0,   0, 200], # river
+                    [250,   0, 150], # urban residential
+                    [0, 150, 200], # lake
+                    [0, 200, 250], # pond
+                    [150, 200, 250], # fish pond
+                    [250, 250, 250], # snow
+                    [200, 200, 200], # bareland
+                    [200, 150, 150], # rural residential
+                    [250, 200, 150], # stadium
+                    [150, 150,   0], # square
+                    [250, 150, 150], # road
+                    [250, 150,   0], # overpass
+                    [250, 200, 250], # railway station
+                    [200, 150,   0] # airport
+                    # [0,   0,   0] # unlabeled
+                 ]
+        )
+
     def __init__(self,
-                 root,
-                 img_folder,
-                 mask_folder,
-                 transform=None,
-                 target_transform=None):
+                 img_suffix='.tif',
+                 seg_map_suffix='_24label.png',
+                 reduce_zero_label=True,
+                 **kwargs) -> None:
         super().__init__(
-            root, transform=transform, target_transform=target_transform)
-        self.img_folder = img_folder
-        self.mask_folder = mask_folder
-        self.images = list(
-            sorted(os.listdir(os.path.join(self.root, img_folder))))
-        self.masks = list(
-            sorted(os.listdir(os.path.join(self.root, mask_folder))))
-        self.color_to_class = create_palette(
-            os.path.join(self.root, 'class_dict.csv'))
-
-    def __getitem__(self, index):
-        img_path = os.path.join(self.root, self.img_folder, self.images[index])
-        mask_path = os.path.join(self.root, self.mask_folder,
-                                 self.masks[index])
-
-        img = Image.open(img_path).convert('RGB')
-        labels = Image.open(mask_path)  # Convert to RGB
-        labels = np.array(labels)-1
-        if self.transform is not None:
-            img = self.transform(img)
-        if self.target_transform is not None:
-            labels = self.target_transform(labels)
-        data_samples = dict(
-            labels=labels, img_path=img_path, mask_path=mask_path)
-        return img, data_samples
-
-    def __len__(self):
-        return len(self.images)
+            img_suffix=img_suffix,
+            seg_map_suffix=seg_map_suffix,
+            reduce_zero_label=reduce_zero_label,
+            **kwargs)
