@@ -152,14 +152,14 @@ def main():
         param_scheduler=dict(type='LinearLR'),
         default_hooks = dict(
             timer=dict(type='IterTimerHook'),
-            logger=dict(type='LoggerHook', interval=1, log_metric_by_epoch=False),
+            logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
             param_scheduler=dict(type='ParamSchedulerHook'),
             checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=1000),
             sampler_seed=dict(type='DistSamplerSeedHook'),
             # visualization=dict(type='SegVisualizationHook')
             ),
         launcher=args.launcher,
-        custom_hooks=[SegVisHook('/media/dell/data1/cw/data/Five-Billion-Pixels/fbp_2048', vis_num=10)],
+        custom_hooks=[SegVisHook('/media/dell/data1/cw/data/Five-Billion-Pixels/fbp_2048', vis_num=5)],
         visualizer=dict(type='Visualizer', vis_backends=[dict(type='WandbVisBackend')]),
     )
        
