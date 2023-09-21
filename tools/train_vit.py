@@ -89,7 +89,8 @@ def main():
         batch_size=1,
         num_workers=2,
         persistent_workers=True,
-        sampler=dict(type='InfiniteSampler', shuffle=True),
+        # sampler=dict(type='InfiniteSampler', shuffle=True),
+        sampler=dict(type='DefaultSampler', shuffle=True),
         dataset=dict(
             type=dataset_type,
             data_root=data_root,
@@ -99,7 +100,7 @@ def main():
             pipeline=train_pipeline))
     val_dataloader = dict(
         batch_size=1,
-        num_workers=4,
+        num_workers=1,
         persistent_workers=True,
         sampler=dict(type='DefaultSampler', shuffle=False),
         dataset=dict(
@@ -111,7 +112,7 @@ def main():
             pipeline=test_pipeline))
     test_dataloader = dict(
         batch_size=1,
-        num_workers=4,
+        num_workers=1,
         persistent_workers=True,
         sampler=dict(type='DefaultSampler', shuffle=False),
         dataset=dict(
@@ -142,7 +143,8 @@ def main():
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
         test_dataloader=test_dataloader,
-        train_cfg = dict(type='IterBasedTrainLoop', max_iters=20000, val_interval=1000),
+        # train_cfg = dict(type='IterBasedTrainLoop', max_iters=10000, val_interval=100),
+        train_cfg=dict(by_epoch=True, max_epochs=50, val_interval=1),
         val_cfg = dict(type='ValLoop'),
         test_cfg = dict(type='TestLoop'),
         val_evaluator=val_evaluator,
@@ -154,7 +156,8 @@ def main():
             timer=dict(type='IterTimerHook'),
             logger=dict(type='LoggerHook', interval=50, log_metric_by_epoch=False),
             param_scheduler=dict(type='ParamSchedulerHook'),
-            checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=1000),
+            # checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=1000),
+            checkpoint=dict(type='CheckpointHook', interval=1),
             sampler_seed=dict(type='DistSamplerSeedHook'),
             # visualization=dict(type='SegVisualizationHook')
             ),
